@@ -10,12 +10,13 @@ func TestParseClef(t *testing.T) {
 		{Type: TokenWhitespace, Value: " "},
 		{Type: TokenClefSpecifier, Value: "treble"},
 	}
-	clefSpecifier, remainingTokens, err := ParseClef(tokens)
+	parseContext := ParseContext{}
+	clef, remainingTokens, _, err := ParseKeySignature(tokens, &parseContext)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if clefSpecifier != "treble" {
-		t.Errorf("expected clef specifier 'treble', got '%s'", clefSpecifier)
+	if clef.Sign != "treble" {
+		t.Errorf("expected clef specifier 'treble', got '%s'", clef.Sign)
 	}
 	if len(remainingTokens) != 0 {
 		t.Errorf("expected no remaining tokens, got %d", len(remainingTokens))

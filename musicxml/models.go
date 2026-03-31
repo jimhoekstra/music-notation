@@ -79,3 +79,24 @@ type ScorePartWise struct {
 	PartList PartList `xml:"part-list"`
 	Parts    []Part   `xml:"part"`
 }
+
+type EmptyElement struct {
+	XMLName xml.Name
+}
+
+type Element interface {
+	isMusicXMLElement()
+}
+
+func (s ScorePart) isMusicXMLElement()     {}
+func (p PartList) isMusicXMLElement()      {}
+func (k Key) isMusicXMLElement()           {}
+func (c Clef) isMusicXMLElement()          {}
+func (t Time) isMusicXMLElement()          {}
+func (a Attributes) isMusicXMLElement()    {}
+func (p Pitch) isMusicXMLElement()         {}
+func (n Note) isMusicXMLElement()          {}
+func (m Measure) isMusicXMLElement()       {}
+func (p Part) isMusicXMLElement()          {}
+func (s ScorePartWise) isMusicXMLElement() {}
+func (e EmptyElement) isMusicXMLElement()  {}

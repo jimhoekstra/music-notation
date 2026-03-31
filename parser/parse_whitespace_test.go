@@ -9,7 +9,8 @@ func TestParseWhiteSpace(t *testing.T) {
 		{Type: TokenWhitespace, Value: " "},
 		{Type: TokenNote, Value: "c"},
 	}
-	remainingTokens, err := ParseWhiteSpace(tokens)
+	parseContext := ParseContext{}
+	_, remainingTokens, _, err := ParseWhiteSpace(tokens, &parseContext)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
