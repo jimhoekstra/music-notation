@@ -41,10 +41,10 @@ type Time struct {
 
 type Attributes struct {
 	XMLName   xml.Name `xml:"attributes"`
-	Divisions int      `xml:"divisions"`
-	Key       Key      `xml:"key"`
-	Time      Time     `xml:"time"`
 	Clef      Clef     `xml:"clef"`
+	Key       Key      `xml:"key"`
+	Divisions int      `xml:"divisions"`
+	Time      Time     `xml:"time"`
 }
 
 type Pitch struct {
