@@ -32,9 +32,11 @@ func BuildSingleNoteScoreFromElements() musicxml.ScorePartWise {
 	}
 
 	measure := musicxml.Measure{
-		Number:     1,
-		Attributes: attributes,
-		Notes:      []musicxml.Note{note},
+		Number: 1,
+		Elements: []musicxml.MeasureElement{
+			{Attributes: &attributes},
+			{Note: &note},
+		},
 	}
 
 	part_list := musicxml.PartList{
