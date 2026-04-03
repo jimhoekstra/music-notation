@@ -7,17 +7,16 @@ import (
 )
 
 func MatchesKeySignature(tokens []Token) bool {
-	return matchTypes(tokens, TokenClef, TokenWhitespace, TokenClefSpecifier)
+	return matchTypes(tokens, TokenKey, TokenWhitespace, TokenNote)
 }
 
-func ParseKeySignature(tokens []Token, ctx *ParseContext) (musicxml.Clef, []Token, ParseContext, error) {
+func ParseKeySignature(tokens []Token, ctx *ParseContext) (musicxml.Key, []Token, ParseContext, error) {
 	if MatchesKeySignature(tokens) {
-		clef := musicxml.Clef{
-			Sign: musicxml.ClefSign(tokens[2].Value),
-			Line: 2, // Default line for treble clef; this could be made more flexible if needed
+		key := musicxml.Key{
+			Fifths: 0, // TODO: Set actual key signature based on the note token
 		}
-		return clef, tokens[3:], *ctx, nil
+		return key, tokens[3:], *ctx, nil
 	}
 
-	return musicxml.Clef{}, tokens, *ctx, errors.New("expected a clef token followed by a clef specifier")
+	return musicxml.Key{}, tokens, *ctx, errors.New("expected a key token followed by a note token")
 }

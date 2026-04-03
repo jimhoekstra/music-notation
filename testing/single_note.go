@@ -8,15 +8,15 @@ import (
 // single measure with a single whole note, built directly from Go structs.
 func BuildSingleNoteScoreFromElements() musicxml.ScorePartWise {
 	attributes := musicxml.Attributes{
-		Key: musicxml.Key{
+		Key: &musicxml.Key{
 			Fifths: 1,
 		},
-		Clef: musicxml.Clef{
+		Clef: &musicxml.Clef{
 			Sign: musicxml.TrebleClef,
 			Line: 2,
 		},
-		Divisions: 1,
-		Time: musicxml.Time{
+		Divisions: func() *int { i := 1; return &i }(),
+		Time: &musicxml.Time{
 			Beats:    4,
 			BeatType: 4,
 		},

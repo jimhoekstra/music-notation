@@ -4,19 +4,19 @@ import (
 	"testing"
 )
 
-func TestParseKeySignature(t *testing.T) {
+func TestParseClef(t *testing.T) {
 	tokens := []Token{
-		{Type: TokenKey, Value: "key"},
+		{Type: TokenClef, Value: "clef"},
 		{Type: TokenWhitespace, Value: " "},
-		{Type: TokenNote, Value: "c"},
+		{Type: TokenClefSpecifier, Value: "treble"},
 	}
 	parseContext := ParseContext{}
-	key, remainingTokens, _, err := ParseKeySignature(tokens, &parseContext)
+	clef, remainingTokens, _, err := ParseClef(tokens, &parseContext)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if key.Fifths != 0 {
-		t.Errorf("expected fifths 0, got '%d'", key.Fifths)
+	if clef.Sign != "treble" {
+		t.Errorf("expected clef specifier 'treble', got '%s'", clef.Sign)
 	}
 	if len(remainingTokens) != 0 {
 		t.Errorf("expected no remaining tokens, got %d", len(remainingTokens))

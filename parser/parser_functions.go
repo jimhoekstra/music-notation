@@ -11,10 +11,3 @@ func adapt[T musicxml.Element](f func([]Token, *ParseContext) (T, []Token, Parse
 		return f(tokens, ctx)
 	}
 }
-
-var parseFunctions = []ParseFunction{
-	adapt(ParseKeySignature),
-	adapt(ParseNote),
-	adapt(ParseTimeSignature),
-	adapt(ParseWhiteSpace),
-}
