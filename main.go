@@ -5,17 +5,23 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jimhoekstra/music-notation/io"
 	"github.com/jimhoekstra/music-notation/parser"
 	"github.com/jimhoekstra/music-notation/parser/lexer"
 )
 
 func main() {
-	input := "time 4/4 clef treble key c c d e f / g a b c5 / b4 a g f / e d clef bass 2c /"
+	input, err := io.LoadInputFile("input.txt")
+	if err != nil {
+		fmt.Printf("Error loading input file: %v\n", err)
+		return
+	}
 	tokens := lexer.Tokenize(input)
 
 	ctx := parser.ParseContext{
 		CurrentDuration: 4,
 		CurrentOctave:   4,
+		Division:        4,
 		MeasureNumber:   0,
 	}
 
