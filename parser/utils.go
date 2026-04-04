@@ -11,6 +11,7 @@ import (
 type ParseContext struct {
 	CurrentDuration int
 	CurrentOctave   int
+	Division        int
 	MeasureNumber   int
 }
 
@@ -32,14 +33,6 @@ func tokenInt(t lexer.Token) (int, error) {
 		return 0, fmt.Errorf("invalid number token %q: %w", t.Value, err)
 	}
 	return v, nil
-}
-
-func buildNote(step string, duration int, octave int) musicxml.Note {
-	return musicxml.Note{
-		Pitch:    musicxml.Pitch{Step: step, Octave: octave},
-		Duration: duration,
-		Type:     "quarter", // TODO: Determine the note type based on the duration and divisions
-	}
 }
 
 type ParseFunction func(tokens []lexer.Token, ctx *ParseContext) (musicxml.Element, []lexer.Token, ParseContext, error)

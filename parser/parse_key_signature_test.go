@@ -9,8 +9,9 @@ import (
 func TestParseKeySignature(t *testing.T) {
 	tokens := []lexer.Token{
 		{Type: lexer.TokenKey, Value: "key"},
-		{Type: lexer.TokenWhitespace, Value: " "},
+		{Type: lexer.TokenOpenParen, Value: "("},
 		{Type: lexer.TokenNote, Value: "c"},
+		{Type: lexer.TokenCloseParen, Value: ")"},
 	}
 	parseContext := ParseContext{}
 	key, remainingTokens, _, err := ParseKeySignature(tokens, &parseContext)

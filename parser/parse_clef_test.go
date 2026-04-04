@@ -9,8 +9,9 @@ import (
 func TestParseClef(t *testing.T) {
 	tokens := []lexer.Token{
 		{Type: lexer.TokenClef, Value: "clef"},
-		{Type: lexer.TokenWhitespace, Value: " "},
+		{Type: lexer.TokenOpenParen, Value: "("},
 		{Type: lexer.TokenClefSpecifier, Value: "treble"},
+		{Type: lexer.TokenCloseParen, Value: ")"},
 	}
 	parseContext := ParseContext{}
 	clef, remainingTokens, _, err := ParseClef(tokens, &parseContext)

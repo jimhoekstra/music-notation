@@ -13,6 +13,9 @@ const (
 	TokenKey           TokenType = iota
 	TokenTime          TokenType = iota
 	TokenForwardSlash  TokenType = iota
+	TokenVerticalBar   TokenType = iota
+	TokenOpenParen     TokenType = iota
+	TokenCloseParen    TokenType = iota
 )
 
 func (t TokenType) String() string {
@@ -33,6 +36,12 @@ func (t TokenType) String() string {
 		return "TokenTime"
 	case TokenForwardSlash:
 		return "TokenForwardSlash"
+	case TokenVerticalBar:
+		return "TokenVerticalBar"
+	case TokenOpenParen:
+		return "TokenOpenParen"
+	case TokenCloseParen:
+		return "TokenCloseParen"
 	default:
 		return "TokenUnknown"
 	}
@@ -52,6 +61,9 @@ var Patterns = []Pattern{
 	{Type: TokenNote, Regex: *regexp.MustCompile(`^[a-gA-G][#b]?`)},
 	{Type: TokenNumber, Regex: *regexp.MustCompile(`^\d+`)},
 	{Type: TokenWhitespace, Regex: *regexp.MustCompile(`^\s+`)},
+	{Type: TokenVerticalBar, Regex: *regexp.MustCompile(`^\|`)},
+	{Type: TokenOpenParen, Regex: *regexp.MustCompile(`^\(`)},
+	{Type: TokenCloseParen, Regex: *regexp.MustCompile(`^\)`)},
 }
 
 type Token struct {

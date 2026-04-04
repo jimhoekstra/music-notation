@@ -3,6 +3,7 @@ package parser
 import (
 	"testing"
 
+	"github.com/jimhoekstra/music-notation/musicxml"
 	"github.com/jimhoekstra/music-notation/parser/lexer"
 )
 
@@ -13,7 +14,7 @@ func TestParseNoteDurationAndOctave(t *testing.T) {
 		{Type: lexer.TokenNote, Value: "c"},
 		{Type: lexer.TokenNumber, Value: "4"},
 	}
-	ctx := &ParseContext{CurrentDuration: 1, CurrentOctave: 5}
+	ctx := &ParseContext{CurrentDuration: 1, CurrentOctave: 5, Division: 4}
 	note, tokens, newCtx, err := ParseNote(tokens, ctx)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -35,12 +36,12 @@ func TestParseNoteOctaveOnly(t *testing.T) {
 		{Type: lexer.TokenNote, Value: "c"},
 		{Type: lexer.TokenNumber, Value: "4"},
 	}
-	ctx := &ParseContext{CurrentDuration: 2, CurrentOctave: 5}
+	ctx := &ParseContext{CurrentDuration: 2, CurrentOctave: 5, Division: 4}
 	note, tokens, newCtx, err := ParseNote(tokens, ctx)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if note.Pitch.Step != "C" || note.Duration != 2 || note.Pitch.Octave != 4 {
+	if note.Pitch.Step != "C" || note.Duration != 8 || note.Pitch.Octave != 4 {
 		t.Errorf("unexpected note: %+v", note)
 	}
 	if newCtx.CurrentDuration != 2 || newCtx.CurrentOctave != 4 {
@@ -57,7 +58,7 @@ func TestParseNoteDurationOnly(t *testing.T) {
 		{Type: lexer.TokenNumber, Value: "4"},
 		{Type: lexer.TokenNote, Value: "c"},
 	}
-	ctx := &ParseContext{CurrentDuration: 1, CurrentOctave: 5}
+	ctx := &ParseContext{CurrentDuration: 1, CurrentOctave: 5, Division: 4}
 	note, tokens, newCtx, err := ParseNote(tokens, ctx)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -78,12 +79,12 @@ func TestParseNotePitchOnly(t *testing.T) {
 	tokens := []lexer.Token{
 		{Type: lexer.TokenNote, Value: "c"},
 	}
-	ctx := &ParseContext{CurrentDuration: 2, CurrentOctave: 3}
+	ctx := &ParseContext{CurrentDuration: 2, CurrentOctave: 3, Division: 4}
 	note, tokens, newCtx, err := ParseNote(tokens, ctx)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if note.Pitch.Step != "C" || note.Duration != 2 || note.Pitch.Octave != 3 {
+	if note.Pitch.Step != "C" || note.Duration != 8 || note.Pitch.Octave != 3 {
 		t.Errorf("unexpected note: %+v", note)
 	}
 	if newCtx.CurrentDuration != 2 || newCtx.CurrentOctave != 3 {
@@ -98,7 +99,7 @@ func TestParseNoteNoMatch(t *testing.T) {
 	tokens := []lexer.Token{
 		{Type: lexer.TokenWhitespace, Value: " "},
 	}
-	_, _, _, err := ParseNote(tokens, &ParseContext{CurrentDuration: 1, CurrentOctave: 4})
+	_, _, _, err := ParseNote(tokens, &ParseContext{CurrentDuration: 1, CurrentOctave: 4, Division: 4})
 	if err == nil {
 		t.Error("expected error for non-note token, got nil")
 	}
@@ -111,7 +112,7 @@ func TestParseRemainingTokens(t *testing.T) {
 		{Type: lexer.TokenNumber, Value: "4"},
 		{Type: lexer.TokenWhitespace, Value: " "},
 	}
-	note, tokens, _, err := ParseNote(tokens, &ParseContext{CurrentDuration: 1, CurrentOctave: 5})
+	note, tokens, _, err := ParseNote(tokens, &ParseContext{CurrentDuration: 1, CurrentOctave: 5, Division: 4})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -120,5 +121,20 @@ func TestParseRemainingTokens(t *testing.T) {
 	}
 	if len(tokens) != 1 || tokens[0].Type != lexer.TokenWhitespace || tokens[0].Value != " " {
 		t.Errorf("expected remaining token to be a single whitespace token, got %v", tokens)
+	}
+}
+
+func TestBuildNote(t *testing.T) {
+	note, err := buildNote("C", 4, 4, 4)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	expected := musicxml.Note{
+		Pitch:    musicxml.Pitch{Step: "C", Octave: 4},
+		Duration: 4,
+		Type:     "quarter",
+	}
+	if note != expected {
+		t.Errorf("expected %+v, got %+v", expected, note)
 	}
 }

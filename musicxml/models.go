@@ -57,6 +57,7 @@ type Pitch struct {
 
 type Note struct {
 	XMLName  xml.Name `xml:"note"`
+	Chord    *Chord   `xml:"chord,omitempty"`
 	Pitch    Pitch    `xml:"pitch"`
 	Duration int      `xml:"duration"`
 	Type     string   `xml:"type"`
@@ -93,6 +94,10 @@ type Barline struct {
 	BarStyle string   `xml:"bar-style"`
 }
 
+type Chord struct {
+	XMLName xml.Name `xml:"chord"`
+}
+
 type EmptyElement struct {
 	XMLName xml.Name
 }
@@ -114,6 +119,7 @@ func (m Measure) isMusicXMLElement()       {}
 func (p Part) isMusicXMLElement()          {}
 func (s ScorePartWise) isMusicXMLElement() {}
 func (b Barline) isMusicXMLElement()       {}
+func (c Chord) isMusicXMLElement()         {}
 func (e EmptyElement) isMusicXMLElement()  {}
 
 func (s ScorePart) Name() string { return "ScorePart" }
@@ -202,4 +208,7 @@ func (m Measure) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
 func (b Barline) Name() string {
 	return "Barline: " + b.Location + " " + b.BarStyle
+}
+func (c Chord) Name() string {
+	return "Chord"
 }

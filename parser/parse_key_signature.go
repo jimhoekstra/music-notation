@@ -8,7 +8,7 @@ import (
 )
 
 func MatchesKeySignature(tokens []lexer.Token) bool {
-	return matchTypes(tokens, lexer.TokenKey, lexer.TokenWhitespace, lexer.TokenNote)
+	return matchTypes(tokens, lexer.TokenKey, lexer.TokenOpenParen, lexer.TokenNote, lexer.TokenCloseParen)
 }
 
 func ParseKeySignature(tokens []lexer.Token, ctx *ParseContext) (musicxml.Key, []lexer.Token, ParseContext, error) {
@@ -16,7 +16,7 @@ func ParseKeySignature(tokens []lexer.Token, ctx *ParseContext) (musicxml.Key, [
 		key := musicxml.Key{
 			Fifths: 0, // TODO: Set actual key signature based on the note token
 		}
-		return key, tokens[3:], *ctx, nil
+		return key, tokens[4:], *ctx, nil
 	}
 
 	return musicxml.Key{}, tokens, *ctx, errors.New("expected a key token followed by a note token")

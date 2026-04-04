@@ -9,10 +9,11 @@ import (
 func TestParseTimeSignature(t *testing.T) {
 	tokens := []lexer.Token{
 		{Type: lexer.TokenTime, Value: "time"},
-		{Type: lexer.TokenWhitespace, Value: " "},
+		{Type: lexer.TokenOpenParen, Value: "("},
 		{Type: lexer.TokenNumber, Value: "3"},
 		{Type: lexer.TokenForwardSlash, Value: "/"},
 		{Type: lexer.TokenNumber, Value: "4"},
+		{Type: lexer.TokenCloseParen, Value: ")"},
 	}
 	parseContext := ParseContext{}
 	time, remainingTokens, _, err := ParseTimeSignature(tokens, &parseContext)

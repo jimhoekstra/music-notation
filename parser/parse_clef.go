@@ -8,7 +8,7 @@ import (
 )
 
 func MatchesClef(tokens []lexer.Token) bool {
-	return matchTypes(tokens, lexer.TokenClef, lexer.TokenWhitespace, lexer.TokenClefSpecifier)
+	return matchTypes(tokens, lexer.TokenClef, lexer.TokenOpenParen, lexer.TokenClefSpecifier, lexer.TokenCloseParen)
 }
 
 func ParseClef(tokens []lexer.Token, ctx *ParseContext) (musicxml.Clef, []lexer.Token, ParseContext, error) {
@@ -17,7 +17,7 @@ func ParseClef(tokens []lexer.Token, ctx *ParseContext) (musicxml.Clef, []lexer.
 			Sign: musicxml.ClefSign(tokens[2].Value),
 			Line: 2, // Default line for treble clef; this could be made more flexible if needed
 		}
-		return clef, tokens[3:], *ctx, nil
+		return clef, tokens[4:], *ctx, nil
 	}
 
 	return musicxml.Clef{}, tokens, *ctx, errors.New("expected a clef token followed by a clef specifier")

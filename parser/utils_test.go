@@ -3,7 +3,6 @@ package parser
 import (
 	"testing"
 
-	"github.com/jimhoekstra/music-notation/musicxml"
 	"github.com/jimhoekstra/music-notation/parser/lexer"
 )
 
@@ -96,17 +95,5 @@ func TestTokenIntZero(t *testing.T) {
 	}
 	if v != 0 {
 		t.Errorf("expected 0, got %d", v)
-	}
-}
-
-func TestBuildNote(t *testing.T) {
-	note := buildNote("C", 4, 4)
-	expected := musicxml.Note{
-		Pitch:    musicxml.Pitch{Step: "C", Octave: 4},
-		Duration: 4,
-		Type:     "quarter",
-	}
-	if note != expected {
-		t.Errorf("expected %+v, got %+v", expected, note)
 	}
 }

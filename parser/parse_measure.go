@@ -89,7 +89,7 @@ func NeverMatch(tokens []lexer.Token, ctx *ParseContext) (
 }
 
 func MatchesBarline(tokens []lexer.Token) bool {
-	return matchTypes(tokens, lexer.TokenForwardSlash)
+	return matchTypes(tokens, lexer.TokenVerticalBar)
 }
 
 func ParseBarline(tokens []lexer.Token, ctx *ParseContext) (

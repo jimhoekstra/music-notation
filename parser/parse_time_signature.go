@@ -8,7 +8,7 @@ import (
 )
 
 func MatchesTimeSignature(tokens []lexer.Token) bool {
-	return matchTypes(tokens, lexer.TokenTime, lexer.TokenWhitespace, lexer.TokenNumber, lexer.TokenForwardSlash, lexer.TokenNumber)
+	return matchTypes(tokens, lexer.TokenTime, lexer.TokenOpenParen, lexer.TokenNumber, lexer.TokenForwardSlash, lexer.TokenNumber, lexer.TokenCloseParen)
 }
 
 func ParseTimeSignature(tokens []lexer.Token, ctx *ParseContext) (musicxml.Time, []lexer.Token, ParseContext, error) {
@@ -25,7 +25,7 @@ func ParseTimeSignature(tokens []lexer.Token, ctx *ParseContext) (musicxml.Time,
 			Beats:    beats,
 			BeatType: beatType,
 		}
-		return timeSignature, tokens[5:], *ctx, nil
+		return timeSignature, tokens[6:], *ctx, nil
 	}
 
 	return musicxml.Time{}, tokens, *ctx, errors.New("expected a time signature")
