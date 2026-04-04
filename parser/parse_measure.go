@@ -4,10 +4,11 @@ import (
 	"errors"
 
 	"github.com/jimhoekstra/music-notation/musicxml"
+	"github.com/jimhoekstra/music-notation/parser/lexer"
 )
 
-func ParseElements(tokens []Token, ctx *ParseContext, parsers []ParseFunction, stopParser ParseFunction) (
-	[]musicxml.Element, []Token, ParseContext, error) {
+func ParseElements(tokens []lexer.Token, ctx *ParseContext, parsers []ParseFunction, stopParser ParseFunction) (
+	[]musicxml.Element, []lexer.Token, ParseContext, error) {
 	var elements []musicxml.Element
 
 	for len(tokens) > 0 {
@@ -43,8 +44,8 @@ func ParseElements(tokens []Token, ctx *ParseContext, parsers []ParseFunction, s
 	return elements, tokens, *ctx, nil
 }
 
-func ParseAttributes(tokens []Token, ctx *ParseContext) (
-	musicxml.Attributes, []Token, ParseContext, error) {
+func ParseAttributes(tokens []lexer.Token, ctx *ParseContext) (
+	musicxml.Attributes, []lexer.Token, ParseContext, error) {
 	parsers := []ParseFunction{
 		adapt(ParseClef),
 		adapt(ParseKeySignature),
@@ -82,17 +83,17 @@ func ParseAttributes(tokens []Token, ctx *ParseContext) (
 	}, remainingTokens, newCtx, nil
 }
 
-func NeverMatch(tokens []Token, ctx *ParseContext) (
-	musicxml.EmptyElement, []Token, ParseContext, error) {
+func NeverMatch(tokens []lexer.Token, ctx *ParseContext) (
+	musicxml.EmptyElement, []lexer.Token, ParseContext, error) {
 	return musicxml.EmptyElement{}, tokens, *ctx, errors.New("this parser never matches")
 }
 
-func MatchesBarline(tokens []Token) bool {
-	return matchTypes(tokens, TokenForwardSlash)
+func MatchesBarline(tokens []lexer.Token) bool {
+	return matchTypes(tokens, lexer.TokenForwardSlash)
 }
 
-func ParseBarline(tokens []Token, ctx *ParseContext) (
-	musicxml.Barline, []Token, ParseContext, error) {
+func ParseBarline(tokens []lexer.Token, ctx *ParseContext) (
+	musicxml.Barline, []lexer.Token, ParseContext, error) {
 
 	if MatchesBarline(tokens) {
 		return musicxml.Barline{
@@ -104,8 +105,8 @@ func ParseBarline(tokens []Token, ctx *ParseContext) (
 	}
 }
 
-func ParseMeasure(tokens []Token, ctx *ParseContext) (
-	musicxml.Measure, []Token, ParseContext, error) {
+func ParseMeasure(tokens []lexer.Token, ctx *ParseContext) (
+	musicxml.Measure, []lexer.Token, ParseContext, error) {
 	parsers := []ParseFunction{
 		adapt(ParseAttributes),
 		adapt(ParseNote),

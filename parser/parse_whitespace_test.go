@@ -2,12 +2,14 @@ package parser
 
 import (
 	"testing"
+
+	"github.com/jimhoekstra/music-notation/parser/lexer"
 )
 
 func TestParseWhiteSpace(t *testing.T) {
-	tokens := []Token{
-		{Type: TokenWhitespace, Value: " "},
-		{Type: TokenNote, Value: "c"},
+	tokens := []lexer.Token{
+		{Type: lexer.TokenWhitespace, Value: " "},
+		{Type: lexer.TokenNote, Value: "c"},
 	}
 	parseContext := ParseContext{}
 	_, remainingTokens, _, err := ParseWhiteSpace(tokens, &parseContext)

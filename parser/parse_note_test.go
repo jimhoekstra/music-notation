@@ -2,14 +2,16 @@ package parser
 
 import (
 	"testing"
+
+	"github.com/jimhoekstra/music-notation/parser/lexer"
 )
 
 func TestParseNoteDurationAndOctave(t *testing.T) {
 	// "4c4" — explicit duration and octave
-	tokens := []Token{
-		{Type: TokenNumber, Value: "4"},
-		{Type: TokenNote, Value: "c"},
-		{Type: TokenNumber, Value: "4"},
+	tokens := []lexer.Token{
+		{Type: lexer.TokenNumber, Value: "4"},
+		{Type: lexer.TokenNote, Value: "c"},
+		{Type: lexer.TokenNumber, Value: "4"},
 	}
 	ctx := &ParseContext{CurrentDuration: 1, CurrentOctave: 5}
 	note, tokens, newCtx, err := ParseNote(tokens, ctx)
@@ -29,9 +31,9 @@ func TestParseNoteDurationAndOctave(t *testing.T) {
 
 func TestParseNoteOctaveOnly(t *testing.T) {
 	// "c4" — explicit octave, use current duration
-	tokens := []Token{
-		{Type: TokenNote, Value: "c"},
-		{Type: TokenNumber, Value: "4"},
+	tokens := []lexer.Token{
+		{Type: lexer.TokenNote, Value: "c"},
+		{Type: lexer.TokenNumber, Value: "4"},
 	}
 	ctx := &ParseContext{CurrentDuration: 2, CurrentOctave: 5}
 	note, tokens, newCtx, err := ParseNote(tokens, ctx)
@@ -51,9 +53,9 @@ func TestParseNoteOctaveOnly(t *testing.T) {
 
 func TestParseNoteDurationOnly(t *testing.T) {
 	// "4c" — explicit duration, use current octave
-	tokens := []Token{
-		{Type: TokenNumber, Value: "4"},
-		{Type: TokenNote, Value: "c"},
+	tokens := []lexer.Token{
+		{Type: lexer.TokenNumber, Value: "4"},
+		{Type: lexer.TokenNote, Value: "c"},
 	}
 	ctx := &ParseContext{CurrentDuration: 1, CurrentOctave: 5}
 	note, tokens, newCtx, err := ParseNote(tokens, ctx)
@@ -73,8 +75,8 @@ func TestParseNoteDurationOnly(t *testing.T) {
 
 func TestParseNotePitchOnly(t *testing.T) {
 	// "c" — use current duration and octave
-	tokens := []Token{
-		{Type: TokenNote, Value: "c"},
+	tokens := []lexer.Token{
+		{Type: lexer.TokenNote, Value: "c"},
 	}
 	ctx := &ParseContext{CurrentDuration: 2, CurrentOctave: 3}
 	note, tokens, newCtx, err := ParseNote(tokens, ctx)
@@ -93,8 +95,8 @@ func TestParseNotePitchOnly(t *testing.T) {
 }
 
 func TestParseNoteNoMatch(t *testing.T) {
-	tokens := []Token{
-		{Type: TokenWhitespace, Value: " "},
+	tokens := []lexer.Token{
+		{Type: lexer.TokenWhitespace, Value: " "},
 	}
 	_, _, _, err := ParseNote(tokens, &ParseContext{CurrentDuration: 1, CurrentOctave: 4})
 	if err == nil {
@@ -103,11 +105,11 @@ func TestParseNoteNoMatch(t *testing.T) {
 }
 
 func TestParseRemainingTokens(t *testing.T) {
-	tokens := []Token{
-		{Type: TokenNumber, Value: "4"},
-		{Type: TokenNote, Value: "c"},
-		{Type: TokenNumber, Value: "4"},
-		{Type: TokenWhitespace, Value: " "},
+	tokens := []lexer.Token{
+		{Type: lexer.TokenNumber, Value: "4"},
+		{Type: lexer.TokenNote, Value: "c"},
+		{Type: lexer.TokenNumber, Value: "4"},
+		{Type: lexer.TokenWhitespace, Value: " "},
 	}
 	note, tokens, _, err := ParseNote(tokens, &ParseContext{CurrentDuration: 1, CurrentOctave: 5})
 	if err != nil {
@@ -116,7 +118,7 @@ func TestParseRemainingTokens(t *testing.T) {
 	if note.Pitch.Step != "C" || note.Pitch.Octave != 4 || note.Duration != 4 {
 		t.Errorf("unexpected note: %+v", note)
 	}
-	if len(tokens) != 1 || tokens[0].Type != TokenWhitespace || tokens[0].Value != " " {
+	if len(tokens) != 1 || tokens[0].Type != lexer.TokenWhitespace || tokens[0].Value != " " {
 		t.Errorf("expected remaining token to be a single whitespace token, got %v", tokens)
 	}
 }

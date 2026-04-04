@@ -2,13 +2,15 @@ package parser
 
 import (
 	"testing"
+
+	"github.com/jimhoekstra/music-notation/parser/lexer"
 )
 
 func TestParseKeySignature(t *testing.T) {
-	tokens := []Token{
-		{Type: TokenKey, Value: "key"},
-		{Type: TokenWhitespace, Value: " "},
-		{Type: TokenNote, Value: "c"},
+	tokens := []lexer.Token{
+		{Type: lexer.TokenKey, Value: "key"},
+		{Type: lexer.TokenWhitespace, Value: " "},
+		{Type: lexer.TokenNote, Value: "c"},
 	}
 	parseContext := ParseContext{}
 	key, remainingTokens, _, err := ParseKeySignature(tokens, &parseContext)

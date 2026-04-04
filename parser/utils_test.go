@@ -4,72 +4,73 @@ import (
 	"testing"
 
 	"github.com/jimhoekstra/music-notation/musicxml"
+	"github.com/jimhoekstra/music-notation/parser/lexer"
 )
 
 func TestMatchTypesSingle(t *testing.T) {
-	tokens := []Token{
-		{Type: TokenNote, Value: "c"},
+	tokens := []lexer.Token{
+		{Type: lexer.TokenNote, Value: "c"},
 	}
-	match := matchTypes(tokens, TokenNote)
+	match := matchTypes(tokens, lexer.TokenNote)
 	if !match {
 		t.Errorf("Expected match to be true, got false")
 	}
 }
 
 func TestMatchTypesSingleNoMatch(t *testing.T) {
-	tokens := []Token{
-		{Type: TokenNote, Value: "c"},
+	tokens := []lexer.Token{
+		{Type: lexer.TokenNote, Value: "c"},
 	}
-	match := matchTypes(tokens, TokenWhitespace)
+	match := matchTypes(tokens, lexer.TokenWhitespace)
 	if match {
 		t.Errorf("Expected match to be false, got true")
 	}
 }
 
 func TestMatchTypesMultiple(t *testing.T) {
-	tokens := []Token{
-		{Type: TokenNote, Value: "c"},
-		{Type: TokenNumber, Value: "4"},
-		{Type: TokenWhitespace, Value: "  "},
+	tokens := []lexer.Token{
+		{Type: lexer.TokenNote, Value: "c"},
+		{Type: lexer.TokenNumber, Value: "4"},
+		{Type: lexer.TokenWhitespace, Value: "  "},
 	}
-	match := matchTypes(tokens, TokenNote, TokenNumber, TokenWhitespace)
+	match := matchTypes(tokens, lexer.TokenNote, lexer.TokenNumber, lexer.TokenWhitespace)
 	if !match {
 		t.Errorf("Expected match to be true, got false")
 	}
 }
 
 func TestMatchTypesMultipleNoMatch(t *testing.T) {
-	tokens := []Token{
-		{Type: TokenNote, Value: "c"},
-		{Type: TokenNumber, Value: "4"},
-		{Type: TokenWhitespace, Value: "  "},
+	tokens := []lexer.Token{
+		{Type: lexer.TokenNote, Value: "c"},
+		{Type: lexer.TokenNumber, Value: "4"},
+		{Type: lexer.TokenWhitespace, Value: "  "},
 	}
-	match := matchTypes(tokens, TokenNote, TokenWhitespace, TokenNumber)
+	match := matchTypes(tokens, lexer.TokenNote, lexer.TokenWhitespace, lexer.TokenNumber)
 	if match {
 		t.Errorf("Expected match to be false, got true")
 	}
 }
 
 func TestMatchTypesTooShort(t *testing.T) {
-	tokens := []Token{
-		{Type: TokenNote, Value: "c"},
+	tokens := []lexer.Token{
+		{Type: lexer.TokenNote, Value: "c"},
 	}
-	match := matchTypes(tokens, TokenNote, TokenNumber)
+	match := matchTypes(tokens, lexer.TokenNote, lexer.TokenNumber)
 	if match {
 		t.Errorf("Expected match to be false, got true")
 	}
 }
 
 func TestMatchTypesEmpty(t *testing.T) {
-	tokens := []Token{}
-	match := matchTypes(tokens, TokenNote)
+	tokens := []lexer.Token{}
+	match := matchTypes(tokens, lexer.TokenNote)
 	if match {
 		t.Errorf("Expected match to be false, got true")
 	}
 }
 
 func TestTokenIntValid(t *testing.T) {
-	token := Token{Type: TokenNumber, Value: "42"}
+	token := lexer.Token{Type: lexer.TokenNumber, Value: "42"}
 	v, err := tokenInt(token)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -80,7 +81,7 @@ func TestTokenIntValid(t *testing.T) {
 }
 
 func TestTokenIntInvalid(t *testing.T) {
-	token := Token{Type: TokenNumber, Value: "abc"}
+	token := lexer.Token{Type: lexer.TokenNumber, Value: "abc"}
 	_, err := tokenInt(token)
 	if err == nil {
 		t.Error("expected error for non-numeric token, got nil")
@@ -88,7 +89,7 @@ func TestTokenIntInvalid(t *testing.T) {
 }
 
 func TestTokenIntZero(t *testing.T) {
-	token := Token{Type: TokenNumber, Value: "0"}
+	token := lexer.Token{Type: lexer.TokenNumber, Value: "0"}
 	v, err := tokenInt(token)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)

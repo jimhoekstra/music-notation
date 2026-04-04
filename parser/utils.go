@@ -5,9 +5,10 @@ import (
 	"strconv"
 
 	"github.com/jimhoekstra/music-notation/musicxml"
+	"github.com/jimhoekstra/music-notation/parser/lexer"
 )
 
-func matchTypes(tokens []Token, types ...TokenType) bool {
+func matchTypes(tokens []lexer.Token, types ...lexer.TokenType) bool {
 	if len(tokens) < len(types) {
 		return false
 	}
@@ -19,7 +20,7 @@ func matchTypes(tokens []Token, types ...TokenType) bool {
 	return true
 }
 
-func tokenInt(t Token) (int, error) {
+func tokenInt(t lexer.Token) (int, error) {
 	v, err := strconv.Atoi(t.Value)
 	if err != nil {
 		return 0, fmt.Errorf("invalid number token %q: %w", t.Value, err)

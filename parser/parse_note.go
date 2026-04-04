@@ -5,19 +5,20 @@ import (
 	"strings"
 
 	"github.com/jimhoekstra/music-notation/musicxml"
+	"github.com/jimhoekstra/music-notation/parser/lexer"
 )
 
-func MatchesNote(tokens []Token) bool {
-	return matchTypes(tokens, TokenNumber, TokenNote, TokenNumber) ||
-		matchTypes(tokens, TokenNote, TokenNumber) ||
-		matchTypes(tokens, TokenNumber, TokenNote) ||
-		matchTypes(tokens, TokenNote)
+func MatchesNote(tokens []lexer.Token) bool {
+	return matchTypes(tokens, lexer.TokenNumber, lexer.TokenNote, lexer.TokenNumber) ||
+		matchTypes(tokens, lexer.TokenNote, lexer.TokenNumber) ||
+		matchTypes(tokens, lexer.TokenNumber, lexer.TokenNote) ||
+		matchTypes(tokens, lexer.TokenNote)
 }
 
-func ParseNote(tokens []Token, ctx *ParseContext) (
-	musicxml.Note, []Token, ParseContext, error) {
+func ParseNote(tokens []lexer.Token, ctx *ParseContext) (
+	musicxml.Note, []lexer.Token, ParseContext, error) {
 	// Check for a note with an explicit duration and octave, e.g. "4c4"
-	if matchTypes(tokens, TokenNumber, TokenNote, TokenNumber) {
+	if matchTypes(tokens, lexer.TokenNumber, lexer.TokenNote, lexer.TokenNumber) {
 		duration, err := tokenInt(tokens[0])
 		if err != nil {
 			return musicxml.Note{}, tokens, *ctx, err
@@ -31,7 +32,7 @@ func ParseNote(tokens []Token, ctx *ParseContext) (
 	}
 
 	// Check for a note with an explicit octave, e.g. "c4"
-	if matchTypes(tokens, TokenNote, TokenNumber) {
+	if matchTypes(tokens, lexer.TokenNote, lexer.TokenNumber) {
 		octave, err := tokenInt(tokens[1])
 		if err != nil {
 			return musicxml.Note{}, tokens, *ctx, err
@@ -41,7 +42,7 @@ func ParseNote(tokens []Token, ctx *ParseContext) (
 	}
 
 	// Check for a note with an explicit duration, e.g. "4c"
-	if matchTypes(tokens, TokenNumber, TokenNote) {
+	if matchTypes(tokens, lexer.TokenNumber, lexer.TokenNote) {
 		duration, err := tokenInt(tokens[0])
 		if err != nil {
 			return musicxml.Note{}, tokens, *ctx, err
@@ -51,7 +52,7 @@ func ParseNote(tokens []Token, ctx *ParseContext) (
 	}
 
 	// Check for a note with only a pitch, e.g. "c"
-	if matchTypes(tokens, TokenNote) {
+	if matchTypes(tokens, lexer.TokenNote) {
 		return buildNote(strings.ToUpper(tokens[0].Value[0:1]),
 			ctx.CurrentDuration, ctx.CurrentOctave), tokens[1:], *ctx, nil
 	}

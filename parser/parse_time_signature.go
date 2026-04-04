@@ -4,13 +4,14 @@ import (
 	"errors"
 
 	"github.com/jimhoekstra/music-notation/musicxml"
+	"github.com/jimhoekstra/music-notation/parser/lexer"
 )
 
-func MatchesTimeSignature(tokens []Token) bool {
-	return matchTypes(tokens, TokenTime, TokenWhitespace, TokenNumber, TokenForwardSlash, TokenNumber)
+func MatchesTimeSignature(tokens []lexer.Token) bool {
+	return matchTypes(tokens, lexer.TokenTime, lexer.TokenWhitespace, lexer.TokenNumber, lexer.TokenForwardSlash, lexer.TokenNumber)
 }
 
-func ParseTimeSignature(tokens []Token, ctx *ParseContext) (musicxml.Time, []Token, ParseContext, error) {
+func ParseTimeSignature(tokens []lexer.Token, ctx *ParseContext) (musicxml.Time, []lexer.Token, ParseContext, error) {
 	if MatchesTimeSignature(tokens) {
 		beats, err := tokenInt(tokens[2])
 		if err != nil {

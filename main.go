@@ -6,11 +6,12 @@ import (
 	"os"
 
 	"github.com/jimhoekstra/music-notation/parser"
+	"github.com/jimhoekstra/music-notation/parser/lexer"
 )
 
 func main() {
-	input := "time 4/4 clef treble c d e f / g a b c5 / b4 a g f / e d 2c /"
-	tokens := parser.Tokenize(input)
+	input := "time 4/4 clef treble key c c d e f / g a b c5 / b4 a g f / e d clef bass 2c /"
+	tokens := lexer.Tokenize(input)
 
 	ctx := parser.ParseContext{
 		CurrentDuration: 4,

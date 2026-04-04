@@ -2,13 +2,15 @@ package parser
 
 import (
 	"testing"
+
+	"github.com/jimhoekstra/music-notation/parser/lexer"
 )
 
 func TestParseClef(t *testing.T) {
-	tokens := []Token{
-		{Type: TokenClef, Value: "clef"},
-		{Type: TokenWhitespace, Value: " "},
-		{Type: TokenClefSpecifier, Value: "treble"},
+	tokens := []lexer.Token{
+		{Type: lexer.TokenClef, Value: "clef"},
+		{Type: lexer.TokenWhitespace, Value: " "},
+		{Type: lexer.TokenClefSpecifier, Value: "treble"},
 	}
 	parseContext := ParseContext{}
 	clef, remainingTokens, _, err := ParseClef(tokens, &parseContext)

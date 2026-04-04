@@ -4,13 +4,14 @@ import (
 	"errors"
 
 	"github.com/jimhoekstra/music-notation/musicxml"
+	"github.com/jimhoekstra/music-notation/parser/lexer"
 )
 
-func MatchesKeySignature(tokens []Token) bool {
-	return matchTypes(tokens, TokenKey, TokenWhitespace, TokenNote)
+func MatchesKeySignature(tokens []lexer.Token) bool {
+	return matchTypes(tokens, lexer.TokenKey, lexer.TokenWhitespace, lexer.TokenNote)
 }
 
-func ParseKeySignature(tokens []Token, ctx *ParseContext) (musicxml.Key, []Token, ParseContext, error) {
+func ParseKeySignature(tokens []lexer.Token, ctx *ParseContext) (musicxml.Key, []lexer.Token, ParseContext, error) {
 	if MatchesKeySignature(tokens) {
 		key := musicxml.Key{
 			Fifths: 0, // TODO: Set actual key signature based on the note token

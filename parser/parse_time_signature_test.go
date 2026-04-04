@@ -2,15 +2,17 @@ package parser
 
 import (
 	"testing"
+
+	"github.com/jimhoekstra/music-notation/parser/lexer"
 )
 
 func TestParseTimeSignature(t *testing.T) {
-	tokens := []Token{
-		{Type: TokenTime, Value: "time"},
-		{Type: TokenWhitespace, Value: " "},
-		{Type: TokenNumber, Value: "3"},
-		{Type: TokenForwardSlash, Value: "/"},
-		{Type: TokenNumber, Value: "4"},
+	tokens := []lexer.Token{
+		{Type: lexer.TokenTime, Value: "time"},
+		{Type: lexer.TokenWhitespace, Value: " "},
+		{Type: lexer.TokenNumber, Value: "3"},
+		{Type: lexer.TokenForwardSlash, Value: "/"},
+		{Type: lexer.TokenNumber, Value: "4"},
 	}
 	parseContext := ParseContext{}
 	time, remainingTokens, _, err := ParseTimeSignature(tokens, &parseContext)

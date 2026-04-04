@@ -1,4 +1,4 @@
-package parser
+package lexer
 
 // Tokenize scans the input string and returns a sequence of tokens.
 func Tokenize(input string) []Token {

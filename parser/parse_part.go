@@ -4,10 +4,11 @@ import (
 	"errors"
 
 	"github.com/jimhoekstra/music-notation/musicxml"
+	"github.com/jimhoekstra/music-notation/parser/lexer"
 )
 
-func ParsePart(tokens []Token, ctx *ParseContext) (
-	musicxml.Part, []Token, ParseContext, error) {
+func ParsePart(tokens []lexer.Token, ctx *ParseContext) (
+	musicxml.Part, []lexer.Token, ParseContext, error) {
 	parsers := []ParseFunction{
 		adapt(ParseMeasure),
 	}

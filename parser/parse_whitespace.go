@@ -4,13 +4,14 @@ import (
 	"errors"
 
 	"github.com/jimhoekstra/music-notation/musicxml"
+	"github.com/jimhoekstra/music-notation/parser/lexer"
 )
 
-func MatchesWhiteSpace(tokens []Token) bool {
-	return matchTypes(tokens, TokenWhitespace)
+func MatchesWhiteSpace(tokens []lexer.Token) bool {
+	return matchTypes(tokens, lexer.TokenWhitespace)
 }
 
-func ParseWhiteSpace(tokens []Token, ctx *ParseContext) (musicxml.Element, []Token, ParseContext, error) {
+func ParseWhiteSpace(tokens []lexer.Token, ctx *ParseContext) (musicxml.Element, []lexer.Token, ParseContext, error) {
 	if MatchesWhiteSpace(tokens) {
 		return musicxml.EmptyElement{}, tokens[1:], *ctx, nil
 	}
