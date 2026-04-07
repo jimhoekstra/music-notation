@@ -18,8 +18,8 @@ func TestParseClef(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if clef.Sign != "treble" {
-		t.Errorf("expected clef specifier 'treble', got '%s'", clef.Sign)
+	if clef.Sign != "G" {
+		t.Errorf("expected clef specifier 'G', got '%s'", clef.Sign)
 	}
 	if len(remainingTokens) != 0 {
 		t.Errorf("expected no remaining tokens, got %d", len(remainingTokens))

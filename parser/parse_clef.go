@@ -11,11 +11,44 @@ func MatchesClef(tokens []lexer.Token) bool {
 	return matchTypes(tokens, lexer.TokenClef, lexer.TokenOpenParen, lexer.TokenClefSpecifier, lexer.TokenCloseParen)
 }
 
+func getClefSign(specifier string) (musicxml.ClefSign, error) {
+	switch specifier {
+	case "treble":
+		return musicxml.TrebleClef, nil
+	case "bass":
+		return musicxml.BassClef, nil
+	default:
+		return "", errors.New("unknown clef specifier: " + specifier)
+	}
+}
+
+func getClefLine(clefSign musicxml.ClefSign) (int, error) {
+	switch clefSign {
+	case musicxml.TrebleClef:
+		return 2, nil
+	case musicxml.BassClef:
+		return 4, nil
+	default:
+		return 0, errors.New("unknown clef sign: " + string(clefSign))
+	}
+}
+
 func ParseClef(tokens []lexer.Token, ctx *ParseContext) (musicxml.Clef, []lexer.Token, ParseContext, error) {
+
+	clefSign, err := getClefSign(tokens[2].Value)
+	if err != nil {
+		return musicxml.Clef{}, tokens, *ctx, err
+	}
+
+	clefLine, err := getClefLine(clefSign)
+	if err != nil {
+		return musicxml.Clef{}, tokens, *ctx, err
+	}
+
 	if MatchesClef(tokens) {
 		clef := musicxml.Clef{
-			Sign: musicxml.ClefSign(tokens[2].Value),
-			Line: 2, // Default line for treble clef; this could be made more flexible if needed
+			Sign: clefSign,
+			Line: clefLine,
 		}
 		return clef, tokens[4:], *ctx, nil
 	}

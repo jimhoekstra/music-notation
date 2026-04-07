@@ -29,10 +29,22 @@ func (c Clef) Render(font *sfnt.Font) (svg.Character, error) {
 	switch c.Sign {
 	case TrebleClef:
 		glyphName := rune(0xe050)
-		return svg.BuildCharacter(font, glyphName)
+		character, err := svg.BuildCharacter(font, glyphName)
+		if err != nil {
+			return svg.Character{}, err
+		}
+		character.Transform(0, 1250-(float64(c.Line)*250), 1)
+		return character, nil
+
 	case BassClef:
 		glyphName := rune(0xe062)
-		return svg.BuildCharacter(font, glyphName)
+		character, err := svg.BuildCharacter(font, glyphName)
+		if err != nil {
+			return svg.Character{}, err
+		}
+		character.Transform(0, 1250-(float64(c.Line)*250), 1)
+		return character, nil
+
 	default:
 		return svg.Character{}, errors.New("cannot render unknown clef sign: " + string(c.Sign))
 	}

@@ -4,13 +4,19 @@ import (
 	"fmt"
 
 	"golang.org/x/image/font/sfnt"
+	"golang.org/x/image/math/fixed"
 )
 
 type Character struct {
+	r       rune
 	D       string
 	Scale   float64
 	XOffset float64
 	YOffset float64
+}
+
+func (c Character) GetAdvance(font *sfnt.Font) (fixed.Int26_6, error) {
+	return GetGlyphAdvance(font, c.r)
 }
 
 func BuildCharacter(font *sfnt.Font, glyphName rune) (Character, error) {
@@ -20,6 +26,7 @@ func BuildCharacter(font *sfnt.Font, glyphName rune) (Character, error) {
 	}
 
 	return Character{
+		r:       glyphName,
 		D:       pathData,
 		Scale:   1.0,
 		XOffset: 0.0,
@@ -28,7 +35,7 @@ func BuildCharacter(font *sfnt.Font, glyphName rune) (Character, error) {
 }
 
 func getTransformString(scale float64, xOffset float64, yOffset float64) string {
-	return fmt.Sprintf("scale(%f) translate(%f, %f)", scale, xOffset, yOffset)
+	return fmt.Sprintf("translate(%f, %f) scale(%f)", xOffset, yOffset, scale)
 }
 
 func (c Character) GetPath() Path {

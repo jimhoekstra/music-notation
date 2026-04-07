@@ -3,6 +3,9 @@ package musicxml
 import (
 	"encoding/xml"
 	"fmt"
+
+	"github.com/jimhoekstra/music-notation/svg"
+	"golang.org/x/image/font/sfnt"
 )
 
 type Attributes struct {
@@ -35,4 +38,39 @@ func (a Attributes) Name() string {
 	}
 
 	return name
+}
+
+// Render returns an svg.Group containing the clef and time signature glyphs.
+func (a Attributes) Render(font *sfnt.Font) (svg.Group, error) {
+	var elements []svg.SVGElement
+	cursor := 0.0
+
+	if a.Clef != nil {
+		clefChar, err := a.Clef.Render(font)
+		if err != nil {
+			return svg.Group{}, fmt.Errorf("cannot render clef: %w", err)
+		}
+		elements = append(elements, svg.SVGElement{Character: &clefChar})
+		advance, err := clefChar.GetAdvance(font)
+		if err != nil {
+			return svg.Group{}, fmt.Errorf("cannot get clef advance: %w", err)
+		}
+		cursor += float64(advance) / 64.0
+	}
+
+	if a.Time != nil {
+		timeGroup, err := a.Time.Render(font)
+		if err != nil {
+			return svg.Group{}, fmt.Errorf("cannot render time signature: %w", err)
+		}
+		timeGroup.Transform(cursor+150, 0, 1)
+		elements = append(elements, svg.SVGElement{Group: &timeGroup})
+	}
+
+	return svg.Group{
+		Elements: elements,
+		XOffset:  0,
+		YOffset:  0,
+		Scale:    1,
+	}, nil
 }

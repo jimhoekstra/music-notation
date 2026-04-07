@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"golang.org/x/image/font"
 	"golang.org/x/image/font/sfnt"
 	"golang.org/x/image/math/fixed"
 )
@@ -23,7 +24,7 @@ func LoadFont(path string) (*sfnt.Font, error) {
 }
 
 func coordToString(coord fixed.Point26_6) string {
-	return fmt.Sprintf("%f, %f", float64(coord.X)/64, float64(coord.Y)/64)
+	return fmt.Sprintf("%d, %d", int(coord.X)/64, int(coord.Y)/64)
 }
 
 func GetPathData(font *sfnt.Font, glyphName rune) (string, error) {
@@ -33,7 +34,7 @@ func GetPathData(font *sfnt.Font, glyphName rune) (string, error) {
 		return "", err
 	}
 
-	segments, err := font.LoadGlyph(&buf, glyphIndex, 1000, nil)
+	segments, err := font.LoadGlyph(&buf, glyphIndex, fixed.Int26_6(1000<<6), nil)
 	if err != nil {
 		return "", err
 	}
@@ -56,4 +57,19 @@ func GetPathData(font *sfnt.Font, glyphName rune) (string, error) {
 
 	svgPath += "Z"
 	return svgPath, nil
+}
+
+func GetGlyphAdvance(f *sfnt.Font, glyphName rune) (fixed.Int26_6, error) {
+	var buf sfnt.Buffer
+	glyphIndex, err := f.GlyphIndex(&buf, glyphName)
+	if err != nil {
+		return 0, err
+	}
+
+	advance, err := f.GlyphAdvance(&buf, glyphIndex, fixed.Int26_6(1000<<6), font.HintingNone)
+	if err != nil {
+		return 0, err
+	}
+
+	return advance, nil
 }
