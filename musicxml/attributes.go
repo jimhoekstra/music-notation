@@ -51,11 +51,25 @@ func (a Attributes) Render(font *sfnt.Font) (svg.Group, error) {
 			return svg.Group{}, fmt.Errorf("cannot render clef: %w", err)
 		}
 		elements = append(elements, svg.SVGElement{Character: &clefChar})
-		advance, err := clefChar.GetAdvance(font)
+		w, err := clefChar.Width(font)
 		if err != nil {
-			return svg.Group{}, fmt.Errorf("cannot get clef advance: %w", err)
+			return svg.Group{}, fmt.Errorf("cannot get clef width: %w", err)
 		}
-		cursor += float64(advance) / 64.0
+		cursor += w
+	}
+
+	if a.Key != nil {
+		keyGroup, err := a.Key.Render(font)
+		if err != nil {
+			return svg.Group{}, fmt.Errorf("cannot render key signature: %w", err)
+		}
+		keyGroup.Transform(cursor, 0, 1)
+		elements = append(elements, svg.SVGElement{Group: &keyGroup})
+		w, err := keyGroup.Width(font)
+		if err != nil {
+			return svg.Group{}, fmt.Errorf("cannot get key signature width: %w", err)
+		}
+		cursor += w
 	}
 
 	if a.Time != nil {
@@ -63,7 +77,7 @@ func (a Attributes) Render(font *sfnt.Font) (svg.Group, error) {
 		if err != nil {
 			return svg.Group{}, fmt.Errorf("cannot render time signature: %w", err)
 		}
-		timeGroup.Transform(cursor+150, 0, 1)
+		timeGroup.Transform(cursor, 0, 1)
 		elements = append(elements, svg.SVGElement{Group: &timeGroup})
 	}
 

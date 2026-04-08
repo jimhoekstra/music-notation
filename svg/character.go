@@ -51,3 +51,12 @@ func (c *Character) Transform(x, y, scale float64) {
 	c.YOffset += y
 	c.Scale *= scale
 }
+
+// Width returns the advance width of the character glyph in SVG coordinate units.
+func (c Character) Width(font *sfnt.Font) (float64, error) {
+	advance, err := c.GetAdvance(font)
+	if err != nil {
+		return 0, err
+	}
+	return float64(advance) / 64.0, nil
+}
