@@ -25,6 +25,10 @@ func (c Clef) isMusicXMLElement() {}
 
 func (c Clef) Name() string { return "Clef: " + string(c.Sign) }
 
+func staveLineToY(line float64) float64 {
+	return 1250 - (line * 250)
+}
+
 func (c Clef) Render(font *sfnt.Font) (svg.Character, error) {
 	switch c.Sign {
 	case TrebleClef:
@@ -33,7 +37,7 @@ func (c Clef) Render(font *sfnt.Font) (svg.Character, error) {
 		if err != nil {
 			return svg.Character{}, err
 		}
-		character.Transform(0, 1250-(float64(c.Line)*250), 1)
+		character.Transform(0, staveLineToY(float64(c.Line)), 1)
 		return character, nil
 
 	case BassClef:
@@ -42,7 +46,7 @@ func (c Clef) Render(font *sfnt.Font) (svg.Character, error) {
 		if err != nil {
 			return svg.Character{}, err
 		}
-		character.Transform(0, 1250-(float64(c.Line)*250), 1)
+		character.Transform(0, staveLineToY(float64(c.Line)), 1)
 		return character, nil
 
 	default:
