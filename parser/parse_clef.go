@@ -35,6 +35,10 @@ func getClefLine(clefSign musicxml.ClefSign) (int, error) {
 
 func ParseClef(tokens []lexer.Token, ctx *ParseContext) (musicxml.Clef, []lexer.Token, ParseContext, error) {
 
+	if !MatchesClef(tokens) {
+		return musicxml.Clef{}, tokens, *ctx, errors.New("expected a clef token followed by a clef specifier")
+	}
+
 	clefSign, err := getClefSign(tokens[2].Value)
 	if err != nil {
 		return musicxml.Clef{}, tokens, *ctx, err
@@ -45,13 +49,9 @@ func ParseClef(tokens []lexer.Token, ctx *ParseContext) (musicxml.Clef, []lexer.
 		return musicxml.Clef{}, tokens, *ctx, err
 	}
 
-	if MatchesClef(tokens) {
-		clef := musicxml.Clef{
-			Sign: clefSign,
-			Line: clefLine,
-		}
-		return clef, tokens[4:], *ctx, nil
+	clef := musicxml.Clef{
+		Sign: clefSign,
+		Line: clefLine,
 	}
-
-	return musicxml.Clef{}, tokens, *ctx, errors.New("expected a clef token followed by a clef specifier")
+	return clef, tokens[4:], *ctx, nil
 }

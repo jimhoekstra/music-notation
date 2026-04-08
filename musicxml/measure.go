@@ -4,6 +4,9 @@ import (
 	"encoding/xml"
 	"fmt"
 	"strconv"
+
+	"github.com/jimhoekstra/music-notation/svg"
+	"golang.org/x/image/font/sfnt"
 )
 
 type MeasureElement struct {
@@ -62,4 +65,51 @@ func (m Measure) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	}
 
 	return e.EncodeToken(xml.EndElement{Name: start.Name})
+}
+
+// Render returns an svg.Group containing the rendered Attributes and Notes of
+// the measure, laid out horizontally using a running cursor. Barlines are
+// ignored. Each element is positioned by calling Transform on the returned
+// group before appending it.
+// TODO: add proper spacing between elements, and handle barlines.
+func (m Measure) Render(font *sfnt.Font) (svg.Group, error) {
+	var elements []svg.SVGElement
+	cursor := 0.0
+
+	for _, el := range m.Elements {
+		switch {
+		case el.Attributes != nil:
+			attrsGroup, err := el.Attributes.Render(font)
+			if err != nil {
+				return svg.Group{}, fmt.Errorf("cannot render attributes in measure %d: %w", m.Number, err)
+			}
+			attrsGroup.Transform(cursor, 0, 1)
+			w, err := attrsGroup.Width(font)
+			if err != nil {
+				return svg.Group{}, fmt.Errorf("cannot get attributes width in measure %d: %w", m.Number, err)
+			}
+			cursor += w
+			elements = append(elements, svg.SVGElement{Group: &attrsGroup})
+
+		case el.Note != nil:
+			noteGroup, err := el.Note.Render(font)
+			if err != nil {
+				return svg.Group{}, fmt.Errorf("cannot render note in measure %d: %w", m.Number, err)
+			}
+			noteGroup.Transform(cursor, 0, 1)
+			w, err := noteGroup.Width(font)
+			if err != nil {
+				return svg.Group{}, fmt.Errorf("cannot get note width in measure %d: %w", m.Number, err)
+			}
+			cursor += w
+			elements = append(elements, svg.SVGElement{Group: &noteGroup})
+		}
+	}
+
+	return svg.Group{
+		Elements: elements,
+		XOffset:  0,
+		YOffset:  0,
+		Scale:    1,
+	}, nil
 }
