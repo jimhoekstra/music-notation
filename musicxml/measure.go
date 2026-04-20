@@ -9,6 +9,77 @@ import (
 	"golang.org/x/image/font/sfnt"
 )
 
+// ElementType identifies the type of a rendered measure element.
+type ElementType int
+
+const (
+	AttributesElement ElementType = iota
+	ClefElement
+	KeyElement
+	TimeElement
+	WholeNoteElement
+	HalfNoteElement
+	QuarterNoteElement
+	EighthNoteElement
+	SixteenthNoteElement
+	BarlineElement
+	MeasureStartElement
+	WildcardElement // matches any element type in the second position of a SpacingTable key
+)
+
+// noteElementType maps a MusicXML note type string to the corresponding ElementType.
+func noteElementType(noteType string) ElementType {
+	switch noteType {
+	case "whole":
+		return WholeNoteElement
+	case "half":
+		return HalfNoteElement
+	case "quarter":
+		return QuarterNoteElement
+	case "eighth":
+		return EighthNoteElement
+	case "16th":
+		return SixteenthNoteElement
+	default:
+		return QuarterNoteElement
+	}
+}
+
+// SpacingTable maps pairs of consecutive element types to the minimum
+// required horizontal spacing between them.
+type SpacingTable map[[2]ElementType]float64
+
+// Lookup returns the spacing for the pair (from, to), falling back to
+// (from, WildcardElement) if no exact match exists.
+func (t SpacingTable) Lookup(from, to ElementType) float64 {
+	if spacing, ok := t[[2]ElementType{from, to}]; ok {
+		return spacing * 250
+	}
+	if spacing, ok := t[[2]ElementType{from, WildcardElement}]; ok {
+		return spacing * 250
+	}
+	if spacing, ok := t[[2]ElementType{WildcardElement, to}]; ok {
+		return spacing * 250
+	}
+	return t[[2]ElementType{WildcardElement, WildcardElement}] * 250
+}
+
+// DefaultSpacingTable defines the default minimum spacing between element pairs.
+var DefaultSpacingTable = SpacingTable{
+	{MeasureStartElement, ClefElement}:      2.0 / 3.0,
+	{ClefElement, KeyElement}:               2.0 / 3.0,
+	{ClefElement, TimeElement}:              2.0 / 3.0,
+	{KeyElement, TimeElement}:               1.0 / 3.0,
+	{TimeElement, WildcardElement}:          1.5,
+	{WholeNoteElement, WildcardElement}:     5.0,
+	{HalfNoteElement, WildcardElement}:      4.0,
+	{QuarterNoteElement, WildcardElement}:   3.0,
+	{EighthNoteElement, WildcardElement}:    2.5,
+	{SixteenthNoteElement, WildcardElement}: 2.0,
+	{WildcardElement, BarlineElement}:       1.0,
+	{WildcardElement, WildcardElement}:      1.0,
+}
+
 type MeasureElement struct {
 	Attributes *Attributes
 	Note       *Note
@@ -74,12 +145,13 @@ func (m Measure) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 // TODO: add proper spacing between elements, and handle barlines.
 func (m Measure) Render(font *sfnt.Font) (svg.Group, error) {
 	var elements []svg.SVGElement
+	prevType := MeasureStartElement
 	cursor := 0.0
 
 	for _, el := range m.Elements {
 		switch {
 		case el.Attributes != nil:
-			attrsGroup, err := el.Attributes.Render(font)
+			attrsGroup, newPrevType, err := el.Attributes.Render(font, DefaultSpacingTable, prevType)
 			if err != nil {
 				return svg.Group{}, fmt.Errorf("cannot render attributes in measure %d: %w", m.Number, err)
 			}
@@ -90,20 +162,36 @@ func (m Measure) Render(font *sfnt.Font) (svg.Group, error) {
 			}
 			cursor += w
 			elements = append(elements, svg.SVGElement{Group: &attrsGroup})
+			prevType = newPrevType
 
 		case el.Note != nil:
+			currentType := noteElementType(el.Note.Type)
+			cursor += DefaultSpacingTable.Lookup(prevType, currentType)
+
 			noteGroup, err := el.Note.Render(font)
 			if err != nil {
 				return svg.Group{}, fmt.Errorf("cannot render note in measure %d: %w", m.Number, err)
 			}
 			noteGroup.Transform(cursor, 0, 1)
-			w, err := noteGroup.Width(font)
-			if err != nil {
-				return svg.Group{}, fmt.Errorf("cannot get note width in measure %d: %w", m.Number, err)
-			}
-			cursor += w
+			// w, err := noteGroup.Width(font)
+			// if err != nil {
+			// 	return svg.Group{}, fmt.Errorf("cannot get note width in measure %d: %w", m.Number, err)
+			// }
+			// cursor += w
 			elements = append(elements, svg.SVGElement{Group: &noteGroup})
+			prevType = currentType
+
+		case el.Barline != nil:
+			currentType := BarlineElement
+			cursor += DefaultSpacingTable.Lookup(prevType, currentType)
+
+			barlineGroup := el.Barline.Render()
+			barlineGroup.Transform(cursor, 0, 1)
+
+			elements = append(elements, svg.SVGElement{Group: &barlineGroup})
+			prevType = currentType
 		}
+
 	}
 
 	return svg.Group{

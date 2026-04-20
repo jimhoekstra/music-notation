@@ -41,44 +41,60 @@ func (a Attributes) Name() string {
 }
 
 // Render returns an svg.Group containing the clef and time signature glyphs.
-func (a Attributes) Render(font *sfnt.Font) (svg.Group, error) {
+func (a Attributes) Render(font *sfnt.Font, spacingTable SpacingTable, prevType ElementType) (svg.Group, ElementType, error) {
 	var elements []svg.SVGElement
 	cursor := 0.0
 
 	if a.Clef != nil {
+		currentType := ClefElement
+		cursor += spacingTable.Lookup(prevType, currentType)
+
 		clefChar, err := a.Clef.Render(font)
 		if err != nil {
-			return svg.Group{}, fmt.Errorf("cannot render clef: %w", err)
+			return svg.Group{}, prevType, fmt.Errorf("cannot render clef: %w", err)
 		}
+
+		clefChar.Transform(cursor, 0, 1)
 		elements = append(elements, svg.SVGElement{Character: &clefChar})
 		w, err := clefChar.Width(font)
 		if err != nil {
-			return svg.Group{}, fmt.Errorf("cannot get clef width: %w", err)
+			return svg.Group{}, prevType, fmt.Errorf("cannot get clef width: %w", err)
 		}
 		cursor += w
+		prevType = currentType
 	}
 
-	if a.Key != nil {
+	if a.Key != nil && a.Key.Fifths != 0 {
+		currentType := KeyElement
+		cursor += spacingTable.Lookup(prevType, currentType)
+
 		keyGroup, err := a.Key.Render(font)
 		if err != nil {
-			return svg.Group{}, fmt.Errorf("cannot render key signature: %w", err)
+			return svg.Group{}, prevType, fmt.Errorf("cannot render key signature: %w", err)
 		}
 		keyGroup.Transform(cursor, 0, 1)
 		elements = append(elements, svg.SVGElement{Group: &keyGroup})
 		w, err := keyGroup.Width(font)
 		if err != nil {
-			return svg.Group{}, fmt.Errorf("cannot get key signature width: %w", err)
+			return svg.Group{}, prevType, fmt.Errorf("cannot get key signature width: %w", err)
 		}
 		cursor += w
+
+		prevType = currentType
 	}
 
 	if a.Time != nil {
+		currentType := TimeElement
+		cursor += spacingTable.Lookup(prevType, currentType)
+
 		timeGroup, err := a.Time.Render(font)
 		if err != nil {
-			return svg.Group{}, fmt.Errorf("cannot render time signature: %w", err)
+			return svg.Group{}, prevType, fmt.Errorf("cannot render time signature: %w", err)
 		}
 		timeGroup.Transform(cursor, 0, 1)
 		elements = append(elements, svg.SVGElement{Group: &timeGroup})
+
+		prevType = currentType
 	}
 
 	return svg.Group{
@@ -86,5 +102,5 @@ func (a Attributes) Render(font *sfnt.Font) (svg.Group, error) {
 		XOffset:  0,
 		YOffset:  0,
 		Scale:    1,
-	}, nil
+	}, prevType, nil
 }

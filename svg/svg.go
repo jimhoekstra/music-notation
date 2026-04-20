@@ -48,6 +48,7 @@ func (svg SVG) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name.Local = "svg"
 	start.Attr = []xml.Attr{
 		{Name: xml.Name{Local: "xmlns"}, Value: "http://www.w3.org/2000/svg"},
+		{Name: xml.Name{Local: "id"}, Value: "music-svg"},
 		{Name: xml.Name{Local: "width"}, Value: strconv.Itoa(svg.Width)},
 		{Name: xml.Name{Local: "height"}, Value: strconv.Itoa(svg.Height)},
 		{Name: xml.Name{Local: "viewBox"}, Value: "0 0 " + strconv.Itoa(int(float64(svg.Width)/svg.Scale)) + " " + strconv.Itoa(int(float64(svg.Height)/svg.Scale))},
